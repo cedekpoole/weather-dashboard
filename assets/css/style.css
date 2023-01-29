@@ -1,15 +1,15 @@
 body {
-    font-family: "Nanum Myeong", sans serif;
+  font-family: "Nanum Myeong", sans serif;
 }
 
 .content-container {
-    max-width: 1400px;
+  max-width: 1400px;
 }
 
 .weather-header {
-/* Created with https://www.css-gradient.com */
-background: #483DC1;
-background: -webkit-linear-gradient(left, #483DC1, #62637B);
-background: -moz-linear-gradient(left, #483DC1, #62637B);
-background: linear-gradient(to right, #483DC1, #62637B);
+  /* Created with https://www.css-gradient.com */
+  background: #483dc1;
+  background: -webkit-linear-gradient(left, #483dc1, #62637b);
+  background: -moz-linear-gradient(left, #483dc1, #62637b);
+  background: linear-gradient(to right, #483dc1, #62637b);
 }

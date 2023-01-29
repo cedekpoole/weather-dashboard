@@ -1,0 +1,15 @@
+body {
+    font-family: "Nanum Myeong", sans serif;
+}
+
+.content-container {
+    max-width: 1400px;
+}
+
+.weather-header {
+/* Created with https://www.css-gradient.com */
+background: #483DC1;
+background: -webkit-linear-gradient(left, #483DC1, #62637B);
+background: -moz-linear-gradient(left, #483DC1, #62637B);
+background: linear-gradient(to right, #483DC1, #62637B);
+}

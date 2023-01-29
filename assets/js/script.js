@@ -13,8 +13,16 @@ function formulateQueryURL(e) {
     $.ajax({
         url: queryURL,
         method: "GET"
-    }).then(function(response) {
-
+    }).then(function(data) {
+        console.log(data);
+    }).fail(function(response) {
+        var cardEl = $("<div>").attr("class", "card");
+        var cardBody = $("<div>").attr("class", "card-body").text("Please put a valid city!");
+        cardEl.append(cardBody);
+        $("#search-form").append(cardEl);
+        setTimeout(function() {
+            cardEl.remove();
+        }, 1500)
     })
 }
 

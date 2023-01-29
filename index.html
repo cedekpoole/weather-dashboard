@@ -36,12 +36,20 @@
             Search for a City:
           </h2>
           <form id="search-form" class="form">
-            <div class="input-group">
+            <div class="input-group mb-2">
               <input
                 type="text"
-                id="search-input"
+                id="city-input"
                 class="form-control rounded"
                 placeholder="City"
+                aria-label="Search"
+                aria-controls="today forecast"
+              />
+              <input
+                type="text"
+                id="country-code-input"
+                class="form-control rounded"
+                placeholder="Code"
                 aria-label="Search"
                 aria-controls="today forecast"
               />
@@ -54,6 +62,7 @@
                 <i class="fa fa-search"></i>
               </button>
             </div>
+            <small class="text-muted ml-1">Country code is optional. See them <a href="https://www.iban.com/country-codes" target="_blank">here</a></small>
             <hr class="hr weather-hr" />
           </form>
           <div class="list-group" id="history"></div>

@@ -23,7 +23,7 @@
   </head>
   <body>
     <header
-      class="container-fluid text-center text-white bg-dark p-2 weather-header"
+      class="container-fluid text-center text-white bg-dark p-2 gradient-color"
     >
       <h1 class="display-3">Weather Dashboard</h1>
     </header>
@@ -62,10 +62,21 @@
                 <i class="fa fa-search"></i>
               </button>
             </div>
-            <small class="text-muted ml-1 country-code">Country code is optional. See them <a href="https://www.iban.com/country-codes" target="_blank">here</a></small>
+            <small class="text-muted ml-1 country-code"
+              >Country code is optional. See them
+              <a href="https://www.iban.com/country-codes" target="_blank"
+                >here</a
+              ></small
+            >
             <hr class="hr weather-hr" />
           </form>
           <div class="list-group" id="history"></div>
+          <button
+            id="clear-history"
+            class="btn border border-primary w-100 history-card"
+          >
+            Clear History
+          </button>
         </aside>
 
         <div class="col-lg-9 pb-3">
@@ -100,6 +111,7 @@
       integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM="
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="assets/js/script.js"></script>
   </body>
 </html>

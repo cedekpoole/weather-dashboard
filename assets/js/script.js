@@ -28,6 +28,15 @@ function showCityWeather(e) {
   })
     .then((response) => {
       console.log(response);
+      var card = $("<div>").attr("class", "card");
+      var historyEl = $("<div>")
+        .attr(
+          "class",
+          "card-body p-2 mb-2 border border-primary text-center history-card"
+        )
+        .text(city + ", " + response.sys.country);
+      card.append(historyEl);
+      $("#history").prepend(card);
     })
     .fail(() => {
       // if the ajax request fails, create a pop up asking the user to pick
@@ -56,6 +65,9 @@ function showCityWeather(e) {
   }).then(function (response) {
     // add dynamically created elements for the 5 day forecast
     console.log(response);
+    // clear input fields after both requests are fulfilled
+    $("#city-input").val("");
+    $("#country-code-input").val("");
   });
 }
 

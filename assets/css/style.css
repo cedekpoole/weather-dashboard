@@ -13,3 +13,8 @@ body {
   background: -moz-linear-gradient(left, #483dc1, #62637b);
   background: linear-gradient(to right, #483dc1, #62637b);
 }
+
+.history-card {
+  cursor: pointer;
+  
+}

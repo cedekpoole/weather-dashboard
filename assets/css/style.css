@@ -2,11 +2,12 @@ body {
   font-family: "Nanum Myeong", sans serif;
 }
 
+/* Set max-width for ultra wide resolutions */
 .content-container {
   max-width: 1400px;
 }
 
-.weather-header {
+.gradient-color {
   /* Created with https://www.css-gradient.com */
   background: #483dc1;
   background: -webkit-linear-gradient(left, #483dc1, #62637b);
@@ -16,5 +17,9 @@ body {
 
 .history-card {
   cursor: pointer;
-  
+}
+
+.history-card:hover {
+  background-color: #483dc1;
+  color: white;
 }

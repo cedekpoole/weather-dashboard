@@ -32,6 +32,16 @@ function showCityWeather(e) {
   })
     .then((response) => {
       console.log(response);
+      var cityAndCode = JSON.parse(localStorage.getItem("cityAndCountry")) || [];
+      console.log(cityAndCode)
+      var cityObject = {
+        city: response.name,
+        countryCode: response.sys.country
+      }
+      cityAndCode.push(cityObject);
+      localStorage.setItem("cityAndCountry", JSON.stringify(cityAndCode));
+      
+     
       var card = $("<div>").attr("class", "card");
       var historyEl = $("<div>")
         .attr(
@@ -41,6 +51,8 @@ function showCityWeather(e) {
         .text(response.name + ", " + response.sys.country);
       card.append(historyEl);
       $("#history").prepend(card);
+      
+
 
     
     showTodayWeather(response)
@@ -86,6 +98,7 @@ function showCityWeather(e) {
 
 function clear() {
   $("#history").empty();
+  localStorage.clear();
 }
 // store a function that can convert kelvin into celsius 
 var kelvinToCelsius = (kelvin) => kelvin - 273.15;
@@ -173,3 +186,11 @@ function getFunnyGif() {
     );
   });
 }
+
+// function recordCity() {
+//     var cityAndCode = $(".history-element").text().split(", ");
+//     var name = cityAndCode[0]
+//     var cityCode = cityAndCode[1]
+//     localStorage.setItem()
+// }
+

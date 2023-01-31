@@ -31,7 +31,7 @@ function showCityWeather(e) {
     method: "GET",
   })
     .then((response) => {
-      console.log(response);
+      $("#history").empty()
       var cityAndCode = JSON.parse(localStorage.getItem("cityAndCountry")) || [];
       console.log(cityAndCode)
       var cityObject = {
@@ -41,15 +41,17 @@ function showCityWeather(e) {
       cityAndCode.push(cityObject);
       localStorage.setItem("cityAndCountry", JSON.stringify(cityAndCode));
       
+      for (var cities of cityAndCode) {
       var card = $("<div>").attr("class", "card");
       var historyEl = $("<div>")
         .attr(
           "class",
           "card-body p-2 mb-2 border border-primary text-center history-card history-element"
         )
-        .text(response.name + ", " + response.sys.country);
+        .text(cities.city + ", " + cities.countryCode);
       card.append(historyEl);
       $("#history").prepend(card);
+      }
       
 
 

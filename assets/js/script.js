@@ -41,7 +41,6 @@ function showCityWeather(e) {
       cityAndCode.push(cityObject);
       localStorage.setItem("cityAndCountry", JSON.stringify(cityAndCode));
       
-     
       var card = $("<div>").attr("class", "card");
       var historyEl = $("<div>")
         .attr(
@@ -92,6 +91,47 @@ function showCityWeather(e) {
     $("#city-input").val("");
     $("#country-code-input").val("");
 
+
+    $("#forecast").empty()
+
+    var index = [7, 15, 23, 31, 39]
+    var days = [];
+
+    for (var day of index) {
+        days.push(moment(response.list[day].dt_txt).format("ddd, Do MMM"));
+    }
+    
+    for (var i = 0; i < index.length; i++) {
+        var div = $("<div>");
+        div.attr("class", "col d-flex align-items-center forecast-card")
+        var card = $("<div>");
+        card.attr("class", "card-body");
+        card.html(
+                    '<p class="card-text text-muted mb-0">' + days[i] + '</p>' +
+                    '<img ' + 
+                        'src="http://openweathermap.org/img/wn/' + response.list[index[i]].weather[0].icon + '@2x.png"' +
+                        'alt="weather icon"' +
+                    '/>' +
+                    '<p class="card-text mt-0 mb-0 lead">Temp: ' +
+                        kelvinToCelsius(response.list[index[i]].main.temp).toFixed(1) +
+                    '°C</p>' +
+                    '<small class="text-muted">Humidity: ' + 
+                    response.list[index[i]].main.humidity + 
+                        '% <br>  Wind: ' + 
+                        // data is in meters per second. To get mph, multiply the result by 2.23694 (weather.gov website)
+                        (2.23694 * response.list[index[i]].wind.speed).toFixed(1) + 'mph' +
+                    '</div>'
+        )
+        div.append(card)
+        $("#forecast").append(div)
+        
+
+    }
+    
+    
+    
+    
+    
 
   });
 }
@@ -186,11 +226,4 @@ function getFunnyGif() {
     );
   });
 }
-
-// function recordCity() {
-//     var cityAndCode = $(".history-element").text().split(", ");
-//     var name = cityAndCode[0]
-//     var cityCode = cityAndCode[1]
-//     localStorage.setItem()
-// }
 

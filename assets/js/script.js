@@ -231,7 +231,7 @@ $("#search-button").on("click", showCityWeather);
 
 // When a history card is clicked, display the data for that particular card
 // (both today's weather and the 5 day weather forecast)
-$("#history").on("click", ".history-element", () => {
+$("#history").on("click", ".history-element", function() {
   var arr = $(this).text().split(", ");
   var city = arr[0];
   var code = arr[1];

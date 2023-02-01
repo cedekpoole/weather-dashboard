@@ -2,7 +2,11 @@
 var queryURL = "";
 var url = "https://api.openweathermap.org/data/2.5/weather?q=";
 var appID = "&appid=7322295fe389f223910eff0b71cd593d";
- // Get today's date using moment.js
+
+// the 5 day forecast
+var forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
+
+// Get today's date using moment.js
 var currentDay = moment().format("Do MMMM YYYY");
 
 function showCityWeather(e) {
@@ -24,6 +28,7 @@ function showCityWeather(e) {
   }
   // call function that creates URL dependent on whether country code is included or not
   checkCountryCode(url);
+  //   return queryURL;
 
   // perform an ajax request to receive JSON data from Open Weather API
   $.ajax({
@@ -31,36 +36,33 @@ function showCityWeather(e) {
     method: "GET",
   })
     .then((response) => {
-      $("#history").empty()
-      var cityAndCode = JSON.parse(localStorage.getItem("cityAndCountry")) || [];
-      console.log(cityAndCode)
+      $("#history").empty();
+      var cityAndCode =
+        JSON.parse(localStorage.getItem("cityAndCountry")) || [];
+      console.log(cityAndCode);
       var cityObject = {
         city: response.name,
-        countryCode: response.sys.country
-      }
+        countryCode: response.sys.country,
+      };
       cityAndCode.push(cityObject);
       localStorage.setItem("cityAndCountry", JSON.stringify(cityAndCode));
-      
+
       for (var cities of cityAndCode) {
-      var card = $("<div>").attr("class", "card");
-      var historyEl = $("<div>")
-        .attr(
-          "class",
-          "card-body p-2 mb-2 border border-primary text-center history-card history-element"
-        )
-        .text(cities.city + ", " + cities.countryCode);
-      card.append(historyEl);
-      $("#history").prepend(card);
+        var card = $("<div>").attr("class", "card");
+        var historyEl = $("<div>")
+          .attr(
+            "class",
+            "card-body p-2 mb-2 border border-primary text-center history-card history-element"
+          )
+          .text(cities.city + ", " + cities.countryCode);
+        card.append(historyEl);
+        $("#history").prepend(card);
       }
-      
 
+      showTodayWeather(response);
 
-    
-    showTodayWeather(response)
-
-    // Send an ajax request to giphy in order to retrieve a funny gif 
-    getFunnyGif()
-
+      // Send an ajax request to giphy in order to retrieve a funny gif
+      getFunnyGif();
     })
     .fail(() => {
       // if the ajax request fails, create a pop up asking the user to pick
@@ -76,9 +78,6 @@ function showCityWeather(e) {
         cardEl.remove();
       }, 1800);
     });
-  
-  // send an ajax request for the 5 day forecast
-  var forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
 
   // check whether user has included country code + create URL for ajax request
   checkCountryCode(forecastURL);
@@ -93,48 +92,7 @@ function showCityWeather(e) {
     $("#city-input").val("");
     $("#country-code-input").val("");
 
-
-    $("#forecast").empty()
-
-    var index = [7, 15, 23, 31, 39]
-    var days = [];
-
-    for (var day of index) {
-        days.push(moment(response.list[day].dt_txt).format("ddd, Do MMM"));
-    }
-    
-    for (var i = 0; i < index.length; i++) {
-        var div = $("<div>");
-        div.attr("class", "col d-flex align-items-center forecast-card")
-        var card = $("<div>");
-        card.attr("class", "card-body");
-        card.html(
-                    '<p class="card-text text-muted mb-0">' + days[i] + '</p>' +
-                    '<img ' + 
-                        'src="http://openweathermap.org/img/wn/' + response.list[index[i]].weather[0].icon + '@2x.png"' +
-                        'alt="weather icon"' +
-                    '/>' +
-                    '<p class="card-text mt-0 mb-0 lead">Temp: ' +
-                        kelvinToCelsius(response.list[index[i]].main.temp).toFixed(1) +
-                    '°C</p>' +
-                    '<small class="text-muted">Humidity: ' + 
-                    response.list[index[i]].main.humidity + 
-                        '% <br>  Wind: ' + 
-                        // data is in meters per second. To get mph, multiply the result by 2.23694 (weather.gov website)
-                        (2.23694 * response.list[index[i]].wind.speed).toFixed(1) + 'mph' +
-                    '</div>'
-        )
-        div.append(card)
-        $("#forecast").append(div)
-        
-
-    }
-    
-    
-    
-    
-    
-
+    show5DayForecast(response);
   });
 }
 
@@ -142,68 +100,84 @@ function clear() {
   $("#history").empty();
   localStorage.clear();
 }
-// store a function that can convert kelvin into celsius 
+// store a function that can convert kelvin into celsius
 var kelvinToCelsius = (kelvin) => kelvin - 273.15;
 
 $("#search-button").on("click", showCityWeather);
 
-$("#history").on("click", ".history-element", function() {
-    var arr = $(this).text().split(", ");
-    var city = arr[0]
-    var code = arr[1]
-    queryURL = url + city + ", " + code + appID;
+$("#history").on("click", ".history-element", function () {
+  var arr = $(this).text().split(", ");
+  var city = arr[0];
+  var code = arr[1];
+  queryURL = url + city + ", " + code + appID;
 
-    $.ajax({
-        url: queryURL,
-        method: "GET"
-    }).then(r => {
-        showTodayWeather(r);
-        getFunnyGif();
-    })
+  $.ajax({
+    url: queryURL,
+    method: "GET",
+  }).then((r) => {
+    showTodayWeather(r);
+    getFunnyGif();
+  });
 
-})
+  var newQueryURL = forecastURL + city + ", " + code + appID;
+  $.ajax({
+    url: newQueryURL,
+    method: "GET",
+  }).then((data) => {
+    show5DayForecast(data);
+  });
+});
 
 $("#clear-history").on("click", clear);
 
 function showTodayWeather(data) {
-    $("#today").html(
-        '<div class="card h-100 overflow-hidden text-center">' +
-            '<div class="row">' +
-            '<div class="col-sm-6 col-12 d-flex align-items-center">' +
-                '<div class="card-body">' +
-                '<div class="align-self-center">' +
-                    '<div class="px-3">' +
-                    '<h4 class="card-title text-bold mb-2">' + data.name + ', ' + data.sys.country + '</h4>' +
-                    '<p class="card-text text-muted mb-0">' + currentDay + '</p>' +
-                    '<img ' + 
-                        'src="http://openweathermap.org/img/wn/' + data.weather[0].icon + '@2x.png"' +
-                        'alt="weather icon"' +
-                    '/>' +
-                    '<p class="card-text mt-0 mb-0 lead">Temperature: ' +
-                        kelvinToCelsius(data.main.temp).toFixed(1) +
-                    '°C</p>' +
-                    '<small class="text-muted">Humidity: ' + 
-                        data.main.humidity + 
-                        '%  Wind Speed: ' + 
-                        // data is in meters per second. To get mph, multiply the result by 2.23694 (weather.gov website)
-                        (2.23694 * data.wind.speed).toFixed(2) + 'mph' +
-                    '</div>' +
-                '</div>' +
-                '</div>' +
-            '</div>' +
-            '<div class="col-sm-6 col-12">' +
-                '<div class="card-img">' +
-                '</div>' +
-            '</div>' +
-            '</div>' +
-        '</div>'
-      )
+  $("#today").html(
+    '<div class="card h-100 overflow-hidden text-center">' +
+      '<div class="row">' +
+      '<div class="col-sm-6 col-12 d-flex align-items-center">' +
+      '<div class="card-body">' +
+      '<div class="align-self-center">' +
+      '<div class="px-3">' +
+      '<h4 class="card-title text-bold mb-2">' +
+      data.name +
+      ", " +
+      data.sys.country +
+      "</h4>" +
+      '<p class="card-text text-muted mb-0">' +
+      currentDay +
+      "</p>" +
+      "<img " +
+      'src="http://openweathermap.org/img/wn/' +
+      data.weather[0].icon +
+      '@2x.png"' +
+      'alt="weather icon"' +
+      "/>" +
+      '<p class="card-text mt-0 mb-0 lead">Temperature: ' +
+      kelvinToCelsius(data.main.temp).toFixed(1) +
+      "°C</p>" +
+      '<small class="text-muted">Humidity: ' +
+      data.main.humidity +
+      "%  Wind Speed: " +
+      // data is in meters per second. To get mph, multiply the result by 2.23694 (weather.gov website)
+      (2.23694 * data.wind.speed).toFixed(2) +
+      "mph" +
+      "</div>" +
+      "</div>" +
+      "</div>" +
+      "</div>" +
+      '<div class="col-sm-6 col-12">' +
+      '<div class="card-img">' +
+      "</div>" +
+      "</div>" +
+      "</div>" +
+      "</div>"
+  );
 }
 
 function getFunnyGif() {
-    // Send an ajax request to giphy in order to retrieve a funny gif 
-    // set the search query term to 'mind blown' and set limit to 10
-    var giphyURL =
+  // Send an ajax request to giphy in order to retrieve a funny gif
+  // set the search query term to 'mind blown' and set limit to 10
+  var giphyURL =
     "https://api.giphy.com/v1/gifs/search?api_key=C8sDCpfJWsC7twWiaUf8zG1stQempp5S&q=mind%20blown&limit=10&offset=0&rating=g&lang=en";
 
   $.ajax({
@@ -213,7 +187,7 @@ function getFunnyGif() {
     console.log(gifData);
     // randomly select an index from the data retrieved (limit is set to 10 gifs)
     // place the URL of random gif into a variable
-    var randomIndex = Math.floor(Math.random() * 10)
+    var randomIndex = Math.floor(Math.random() * 10);
     var gifSrc = gifData.data[randomIndex].images.original.url;
 
     // add the gif source (the url) to an image element and append it to the card-img class
@@ -229,3 +203,47 @@ function getFunnyGif() {
   });
 }
 
+function show5DayForecast(response) {
+  $("#forecast").empty();
+
+  var index = [7, 15, 23, 31, 39];
+  var days = [];
+
+  for (var day of index) {
+    console.log(day);
+    days.push(moment(response.list[day].dt_txt).format("ddd, Do MMM"));
+    console.log(day);
+  }
+
+  for (var i = 0; i < index.length; i++) {
+    var div = $("<div>");
+    div.attr("class", "col d-flex align-items-center forecast-card");
+
+    var card = $("<div>");
+    card.attr("class", "card-body");
+    card.html(
+      '<p class="card-text text-muted mb-0">' +
+        days[i] +
+        "</p>" +
+        "<img " +
+        'src="http://openweathermap.org/img/wn/' +
+        response.list[index[i]].weather[0].icon +
+        '@2x.png"' +
+        'alt="weather icon"' +
+        "/>" +
+        '<p class="card-text mt-0 mb-0 lead">Temp: ' +
+        kelvinToCelsius(response.list[index[i]].main.temp).toFixed(1) +
+        "°C</p>" +
+        '<small class="text-muted">Humidity: ' +
+        response.list[index[i]].main.humidity +
+        "% <br>  Wind: " +
+        // data is in meters per second. To get mph, multiply the result by 2.23694 (weather.gov website)
+        (2.23694 * response.list[index[i]].wind.speed).toFixed(1) +
+        "mph" +
+        "</div>"
+    );
+    
+    div.append(card);
+    $("#forecast").append(div);
+  }
+}

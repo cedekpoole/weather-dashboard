@@ -1,38 +1,32 @@
 // Set a variable for the beginning of the URL and app ID
-var queryURL = "";
 var url = "https://api.openweathermap.org/data/2.5/weather?q=";
 var appID = "&appid=7322295fe389f223910eff0b71cd593d";
 
-// the 5 day forecast
+// the 5 day forecast url start
 var forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
 
 // Get today's date using moment.js
 var currentDay = moment().format("Do MMMM YYYY");
 
+function getQueryURL(urlStart) {
+  var city = $("#city-input").val().trim();
+  var countryCode = $("#country-code-input").val().trim();
+  // If the country code is not left blank (as it is optional), add it to the query's URL
+  // create a function to reuse for forecast query URL
+  if (countryCode.length !== 0) {
+    return urlStart + city + "," + countryCode + appID;
+    // If the country code is left blank, leave it out of the query's URL
+  } else {
+    return urlStart + city + appID;
+  }
+}
+
 function showCityWeather(e) {
   e.preventDefault();
 
-  // Get the city and the country code from the user's input
-  var city = $("#city-input").val().trim();
-  var countryCode = $("#country-code-input").val().trim();
-
-  // If the country code is not left blank (as it is optional), add it to the query's URL
-  // create a function to reuse for forecast query URL
-  function checkCountryCode(urlStart) {
-    if (countryCode.length !== 0) {
-      queryURL = urlStart + city + "," + countryCode + appID;
-      // If the country code is left blank, leave it out of the query's URL
-    } else {
-      queryURL = urlStart + city + appID;
-    }
-  }
-  // call function that creates URL dependent on whether country code is included or not
-  checkCountryCode(url);
-  //   return queryURL;
-
-  // perform an ajax request to receive JSON data from Open Weather API
+  //   // perform an ajax request to receive JSON data from Open Weather API
   $.ajax({
-    url: queryURL,
+    url: getQueryURL(url),
     method: "GET",
   })
     .then((response) => {
@@ -80,10 +74,10 @@ function showCityWeather(e) {
     });
 
   // check whether user has included country code + create URL for ajax request
-  checkCountryCode(forecastURL);
+  //   checkCountryCode(forecastURL);
 
   $.ajax({
-    url: queryURL,
+    url: getQueryURL(forecastURL),
     method: "GET",
   }).then(function (response) {
     // add dynamically created elements for the 5 day forecast
@@ -210,9 +204,7 @@ function show5DayForecast(response) {
   var days = [];
 
   for (var day of index) {
-    console.log(day);
     days.push(moment(response.list[day].dt_txt).format("ddd, Do MMM"));
-    console.log(day);
   }
 
   for (var i = 0; i < index.length; i++) {
@@ -242,8 +234,26 @@ function show5DayForecast(response) {
         "mph" +
         "</div>"
     );
-    
+
     div.append(card);
     $("#forecast").append(div);
   }
 }
+
+function showHistory() {
+    var cityAndCode =
+        JSON.parse(localStorage.getItem("cityAndCountry")) || [];
+        for (var cities of cityAndCode) {
+            var card = $("<div>").attr("class", "card");
+            var historyEl = $("<div>")
+              .attr(
+                "class",
+                "card-body p-2 mb-2 border border-primary text-center history-card history-element"
+              )
+              .text(cities.city + ", " + cities.countryCode);
+            card.append(historyEl);
+            $("#history").prepend(card);
+          }
+}
+
+showHistory()

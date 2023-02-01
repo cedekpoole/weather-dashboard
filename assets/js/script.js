@@ -41,17 +41,7 @@ function showCityWeather(e) {
       cityAndCode.push(cityObject);
       localStorage.setItem("cityAndCountry", JSON.stringify(cityAndCode));
 
-      for (var cities of cityAndCode) {
-        var card = $("<div>").attr("class", "card");
-        var historyEl = $("<div>")
-          .attr(
-            "class",
-            "card-body p-2 mb-2 border border-primary text-center history-card history-element"
-          )
-          .text(cities.city + ", " + cities.countryCode);
-        card.append(historyEl);
-        $("#history").prepend(card);
-      }
+      showHistory()
 
       showTodayWeather(response);
 
@@ -128,7 +118,7 @@ function showTodayWeather(data) {
   $("#today").html(
     '<div class="card h-100 overflow-hidden text-center">' +
       '<div class="row">' +
-      '<div class="col-sm-6 col-12 d-flex align-items-center">' +
+      '<div class="col-md-6 col-12 d-flex align-items-center">' +
       '<div class="card-body">' +
       '<div class="align-self-center">' +
       '<div class="px-3">' +
@@ -159,7 +149,7 @@ function showTodayWeather(data) {
       "</div>" +
       "</div>" +
       "</div>" +
-      '<div class="col-sm-6 col-12">' +
+      '<div class="col-md-6 col-12">' +
       '<div class="card-img">' +
       "</div>" +
       "</div>" +

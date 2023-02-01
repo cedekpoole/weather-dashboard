@@ -1,13 +1,16 @@
-// Set a variable for the beginning of the URL and app ID
-var url = "https://api.openweathermap.org/data/2.5/weather?q=";
+// Set a variable for the app ID
 var appID = "&appid=7322295fe389f223910eff0b71cd593d";
 
-// the 5 day forecast url start
+// Today's weather url start
+var url = "https://api.openweathermap.org/data/2.5/weather?q=";
+
+// The 5 day forecast url start
 var forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
 
 // Get today's date using moment.js
 var currentDay = moment().format("Do MMMM YYYY");
 
+// Create a function that creates a query URL for the ajax requests
 function getQueryURL(urlStart) {
   var city = $("#city-input").val().trim();
   var countryCode = $("#country-code-input").val().trim();
@@ -21,16 +24,23 @@ function getQueryURL(urlStart) {
   }
 }
 
+// Create a function that executes when the search button is clicked
+// This function will: 1) save search to local storage and add it to history
+// 2) show today's weather and render a funny gif 3) create a pop up for when user
+// input is invalid and thus ajax request fails 4) get the five day forecast
 function showCityWeather(e) {
   e.preventDefault();
 
-  //   // perform an ajax request to receive JSON data from Open Weather API
+  // Perform an ajax request to receive JSON data from Open Weather API
   $.ajax({
     url: getQueryURL(url),
     method: "GET",
   })
     .then((response) => {
+      // Clear previous history cards to stop them duplicating
       $("#history").empty();
+
+      // Save city and country code to local storage
       var cityAndCode =
         JSON.parse(localStorage.getItem("cityAndCountry")) || [];
       console.log(cityAndCode);
@@ -41,11 +51,13 @@ function showCityWeather(e) {
       cityAndCode.push(cityObject);
       localStorage.setItem("cityAndCountry", JSON.stringify(cityAndCode));
 
-      showHistory()
+      // Execute function that creates history cards (of the local storage data) in the side article
+      showHistory();
 
+      // Execute function that shows today's weather forecast
       showTodayWeather(response);
 
-      // Send an ajax request to giphy in order to retrieve a funny gif
+      // Add function that sends an ajax request to giphy in order to retrieve a funny gif
       getFunnyGif();
     })
     .fail(() => {
@@ -62,10 +74,7 @@ function showCityWeather(e) {
         cardEl.remove();
       }, 1800);
     });
-
-  // check whether user has included country code + create URL for ajax request
-  //   checkCountryCode(forecastURL);
-
+  // Send another ajax request to retrieve the 5 day weather forecast
   $.ajax({
     url: getQueryURL(forecastURL),
     method: "GET",
@@ -75,45 +84,11 @@ function showCityWeather(e) {
     // clear input fields after all requests are fulfilled
     $("#city-input").val("");
     $("#country-code-input").val("");
-
+    //
     show5DayForecast(response);
   });
 }
-
-function clear() {
-  $("#history").empty();
-  localStorage.clear();
-}
-// store a function that can convert kelvin into celsius
-var kelvinToCelsius = (kelvin) => kelvin - 273.15;
-
-$("#search-button").on("click", showCityWeather);
-
-$("#history").on("click", ".history-element", function () {
-  var arr = $(this).text().split(", ");
-  var city = arr[0];
-  var code = arr[1];
-  queryURL = url + city + ", " + code + appID;
-
-  $.ajax({
-    url: queryURL,
-    method: "GET",
-  }).then((r) => {
-    showTodayWeather(r);
-    getFunnyGif();
-  });
-
-  var newQueryURL = forecastURL + city + ", " + code + appID;
-  $.ajax({
-    url: newQueryURL,
-    method: "GET",
-  }).then((data) => {
-    show5DayForecast(data);
-  });
-});
-
-$("#clear-history").on("click", clear);
-
+// Create a function that adds elements of today's weather dynamically 
 function showTodayWeather(data) {
   $("#today").html(
     '<div class="card h-100 overflow-hidden text-center">' +
@@ -169,12 +144,12 @@ function getFunnyGif() {
     method: "GET",
   }).then((gifData) => {
     console.log(gifData);
-    // randomly select an index from the data retrieved (limit is set to 10 gifs)
+    // Randomly select an index from the data retrieved (limit is set to 10 gifs)
     // place the URL of random gif into a variable
     var randomIndex = Math.floor(Math.random() * 10);
     var gifSrc = gifData.data[randomIndex].images.original.url;
 
-    // add the gif source (the url) to an image element and append it to the card-img class
+    // Add the gif source (the url) to an image element and append it to the card-img class
     $(".card-img").append(
       "<img " +
         'class="img-fluid proj-img w-100 h-100"' +
@@ -188,15 +163,18 @@ function getFunnyGif() {
 }
 
 function show5DayForecast(response) {
+// Make sure the forecast section is empty to stop elements from duplicating 
   $("#forecast").empty();
 
+  // Store indexes of the response's data list (which correlate to dates) in an array
   var index = [7, 15, 23, 31, 39];
   var days = [];
 
+  // Add each date to a previously empty array of days 
   for (var day of index) {
     days.push(moment(response.list[day].dt_txt).format("ddd, Do MMM"));
   }
-
+  // For each element in the index array, dynamically create a forecast card that displays future weather 
   for (var i = 0; i < index.length; i++) {
     var div = $("<div>");
     div.attr("class", "col d-flex align-items-center forecast-card");
@@ -229,21 +207,61 @@ function show5DayForecast(response) {
     $("#forecast").append(div);
   }
 }
-
+// Create a function that dynamically adds a history card for each city in local storage
 function showHistory() {
-    var cityAndCode =
-        JSON.parse(localStorage.getItem("cityAndCountry")) || [];
-        for (var cities of cityAndCode) {
-            var card = $("<div>").attr("class", "card");
-            var historyEl = $("<div>")
-              .attr(
-                "class",
-                "card-body p-2 mb-2 border border-primary text-center history-card history-element"
-              )
-              .text(cities.city + ", " + cities.countryCode);
-            card.append(historyEl);
-            $("#history").prepend(card);
-          }
+  var cityAndCode = JSON.parse(localStorage.getItem("cityAndCountry")) || [];
+  for (var cities of cityAndCode) {
+    var card = $("<div>").attr("class", "card");
+    var historyEl = $("<div>")
+      .attr(
+        "class",
+        "card-body p-2 mb-2 border border-primary text-center history-card history-element"
+      )
+      .text(cities.city + ", " + cities.countryCode);
+    card.append(historyEl);
+    $("#history").prepend(card);
+  }
 }
 
-showHistory()
+// Store a function that can convert kelvin into celsius
+var kelvinToCelsius = (kelvin) => kelvin - 273.15;
+
+// When the search button is clicked, execute showCityWeather function
+$("#search-button").on("click", showCityWeather);
+
+// When a history card is clicked, display the data for that particular card
+// (both today's weather and the 5 day weather forecast)
+$("#history").on("click", ".history-element", () => {
+  var arr = $(this).text().split(", ");
+  var city = arr[0];
+  var code = arr[1];
+  queryURL = url + city + ", " + code + appID;
+
+  $.ajax({
+    url: queryURL,
+    method: "GET",
+  }).then((r) => {
+    showTodayWeather(r);
+    getFunnyGif();
+  });
+
+  var newQueryURL = forecastURL + city + ", " + code + appID;
+  $.ajax({
+    url: newQueryURL,
+    method: "GET",
+  }).then((data) => {
+    show5DayForecast(data);
+  });
+});
+
+// Create a function that clears local and empties history section
+function clear() {
+    $("#history").empty();
+    localStorage.clear();
+  }
+
+// When clear history button is clicked, execute 'clear' function
+$("#clear-history").on("click", clear);
+
+// Show previous search results in the left hand article 
+showHistory();
